@@ -17,6 +17,7 @@
 
 package com.oltpbenchmark.benchmarks.tpch.procedures;
 
+import com.oltpbenchmark.api.TransactionType;
 import com.oltpbenchmark.api.SQLStmt;
 import com.oltpbenchmark.benchmarks.tpch.TPCHUtil;
 import com.oltpbenchmark.util.RandomGenerator;
@@ -27,7 +28,11 @@ import java.sql.SQLException;
 
 public class Q19 extends GenericQuery {
 
-    public final SQLStmt query_stmt = new SQLStmt("""
+    public SQLStmt query_stmt;
+
+    @Override
+    protected void initializeStmts(TransactionType ttype) {
+        String query = """
             SELECT
                SUM(l_extendedprice* (1 - l_discount)) AS revenue
             FROM
@@ -66,8 +71,10 @@ public class Q19 extends GenericQuery {
                   AND l_shipmode IN ('AIR', 'AIR REG')
                   AND l_shipinstruct = 'DELIVER IN PERSON'
                )
-            """
-    );
+            """;
+
+        this.query_stmt = new SQLStmt(query, ttype.getHintset());
+    }
 
     @Override
     protected PreparedStatement getStatement(Connection conn, RandomGenerator rand, double scaleFactor) throws SQLException {

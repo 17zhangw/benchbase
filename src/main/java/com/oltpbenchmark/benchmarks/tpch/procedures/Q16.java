@@ -17,6 +17,7 @@
 
 package com.oltpbenchmark.benchmarks.tpch.procedures;
 
+import com.oltpbenchmark.api.TransactionType;
 import com.oltpbenchmark.api.SQLStmt;
 import com.oltpbenchmark.benchmarks.tpch.TPCHConstants;
 import com.oltpbenchmark.benchmarks.tpch.TPCHUtil;
@@ -30,7 +31,11 @@ import java.util.Set;
 
 public class Q16 extends GenericQuery {
 
-    public final SQLStmt query_stmt = new SQLStmt("""
+    public SQLStmt query_stmt;
+
+    @Override
+    protected void initializeStmts(TransactionType ttype) {
+        String query = """
             SELECT
                p_brand,
                p_type,
@@ -62,8 +67,10 @@ public class Q16 extends GenericQuery {
                p_brand,
                p_type,
                p_size
-            """
-    );
+            """;
+
+        this.query_stmt = new SQLStmt(query, ttype.getHintset());
+    }
 
     @Override
     protected PreparedStatement getStatement(Connection conn, RandomGenerator rand, double scaleFactor) throws SQLException {

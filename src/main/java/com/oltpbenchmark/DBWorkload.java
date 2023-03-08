@@ -216,7 +216,12 @@ public class DBWorkload {
                     postExecutionWait = xmlConfig.getLong(key + "/postExecutionWait");
                 }
 
-                TransactionType tmpType = bench.initTransactionType(txnName, txnId + txnIdOffset, preExecutionWait, postExecutionWait);
+                String hintset = "";
+                if (xmlConfig.containsKey(key + "/hintset")) {
+                    hintset = xmlConfig.getString(key + "/hintset");
+                }
+
+                TransactionType tmpType = bench.initTransactionType(txnName, txnId + txnIdOffset, preExecutionWait, postExecutionWait, hintset);
 
                 // Keep a reference for filtering
                 activeTXTypes.add(tmpType);

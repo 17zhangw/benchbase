@@ -17,6 +17,7 @@
 
 package com.oltpbenchmark.benchmarks.tpch.procedures;
 
+import com.oltpbenchmark.api.TransactionType;
 import com.oltpbenchmark.api.SQLStmt;
 import com.oltpbenchmark.util.RandomGenerator;
 
@@ -42,7 +43,16 @@ public class Q15 extends GenericQuery {
             """
     );
 
-    public final SQLStmt query_stmt = new SQLStmt("""
+    public SQLStmt query_stmt;
+
+    public final SQLStmt dropview_stmt = new SQLStmt("""
+            DROP VIEW revenue0
+            """
+    );
+
+    @Override
+    protected void initializeStmts(TransactionType ttype) {
+        String query = """
             SELECT
                s_suppkey,
                s_name,
@@ -62,13 +72,10 @@ public class Q15 extends GenericQuery {
                )
             ORDER BY
                s_suppkey
-            """
-    );
+            """;
 
-    public final SQLStmt dropview_stmt = new SQLStmt("""
-            DROP VIEW revenue0
-            """
-    );
+        this.query_stmt = new SQLStmt(query, ttype.getHintset());
+    }
 
     @Override
     public void run(Connection conn, RandomGenerator rand, double scaleFactor) throws SQLException {

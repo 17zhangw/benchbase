@@ -323,7 +323,7 @@ public abstract class BenchmarkModule {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public final TransactionType initTransactionType(String procName, int id, long preExecutionWait, long postExecutionWait) {
+    public final TransactionType initTransactionType(String procName, int id, long preExecutionWait, long postExecutionWait, String hintset) {
         if (id == TransactionType.INVALID_ID) {
             throw new RuntimeException(String.format("Procedure %s.%s cannot use the reserved id '%d' for %s", getBenchmarkName(), procName, id, TransactionType.INVALID.getClass().getSimpleName()));
         }
@@ -333,7 +333,7 @@ public abstract class BenchmarkModule {
         String fullName = pkg.getName() + "." + procName;
         Class<? extends Procedure> procClass = (Class<? extends Procedure>) ClassUtil.getClass(fullName);
 
-        return new TransactionType(procClass, id, false, preExecutionWait, postExecutionWait);
+        return new TransactionType(procClass, id, false, preExecutionWait, postExecutionWait, hintset);
     }
 
     public final WorkloadConfiguration getWorkloadConfiguration() {
@@ -353,13 +353,14 @@ public abstract class BenchmarkModule {
             for (Class<? extends Procedure> procClass : this.supplementalProcedures) {
                 TransactionType txn = txns.getType(procClass);
                 if (txn == null) {
-                    txn = new TransactionType(procClass, procClass.hashCode(), true, 0, 0);
+                    txn = new TransactionType(procClass, procClass.hashCode(), true, 0, 0, "");
                     txns.add(txn);
                 }
             }
 
             for (TransactionType txn : txns) {
                 Procedure proc = ClassUtil.newInstance(txn.getProcedureClass(), new Object[0], new Class<?>[0]);
+                proc.initializeStmts(txn);
                 proc.initialize(this.workConf.getDatabaseType());
                 proc_xref.put(txn, proc);
                 proc.loadSQLDialect(this.dialects);

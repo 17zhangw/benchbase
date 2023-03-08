@@ -151,6 +151,8 @@ public abstract class Procedure {
         }
     }
 
+    protected void initializeStmts(TransactionType ttype) { }
+
     /**
      * Hook for testing
      *

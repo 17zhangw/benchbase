@@ -17,6 +17,7 @@
 
 package com.oltpbenchmark.benchmarks.tpch.procedures;
 
+import com.oltpbenchmark.api.TransactionType;
 import com.oltpbenchmark.api.SQLStmt;
 import com.oltpbenchmark.util.RandomGenerator;
 
@@ -27,7 +28,11 @@ import java.sql.SQLException;
 
 public class Q10 extends GenericQuery {
 
-    public final SQLStmt query_stmt = new SQLStmt("""
+    public SQLStmt query_stmt;
+
+    @Override
+    protected void initializeStmts(TransactionType ttype) {
+        String query = """
             SELECT
                c_custkey,
                c_name,
@@ -59,8 +64,10 @@ public class Q10 extends GenericQuery {
                c_comment
             ORDER BY
                revenue DESC LIMIT 20
-            """
-    );
+            """;
+
+        this.query_stmt = new SQLStmt(query, ttype.getHintset());
+    }
 
     @Override
     protected PreparedStatement getStatement(Connection conn, RandomGenerator rand, double scaleFactor) throws SQLException {

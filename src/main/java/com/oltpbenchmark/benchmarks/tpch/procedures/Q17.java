@@ -17,6 +17,7 @@
 
 package com.oltpbenchmark.benchmarks.tpch.procedures;
 
+import com.oltpbenchmark.api.TransactionType;
 import com.oltpbenchmark.api.SQLStmt;
 import com.oltpbenchmark.benchmarks.tpch.TPCHConstants;
 import com.oltpbenchmark.benchmarks.tpch.TPCHUtil;
@@ -28,7 +29,11 @@ import java.sql.SQLException;
 
 public class Q17 extends GenericQuery {
 
-    public final SQLStmt query_stmt = new SQLStmt("""
+    public SQLStmt query_stmt;
+
+    @Override
+    protected void initializeStmts(TransactionType ttype) {
+        String query = """
             SELECT
                SUM(l_extendedprice) / 7.0 AS avg_yearly
             FROM
@@ -45,8 +50,10 @@ public class Q17 extends GenericQuery {
                   lineitem
                WHERE
                   l_partkey = p_partkey )
-            """
-    );
+            """;
+
+        this.query_stmt = new SQLStmt(query, ttype.getHintset());
+    }
 
     @Override
     protected PreparedStatement getStatement(Connection conn, RandomGenerator rand, double scaleFactor) throws SQLException {

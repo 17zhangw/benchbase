@@ -26,20 +26,22 @@ public class TransactionType implements Comparable<TransactionType> {
     }
 
     public static final int INVALID_ID = 0;
-    public static final TransactionType INVALID = new TransactionType(Invalid.class, INVALID_ID, false, 0, 0);
+    public static final TransactionType INVALID = new TransactionType(Invalid.class, INVALID_ID, false, 0, 0, "");
 
     private final Class<? extends Procedure> procedureClass;
     private final int id;
     private final boolean supplemental;
     private final long preExecutionWait;
     private final long postExecutionWait;
+    private final String hintset;
 
-    protected TransactionType(Class<? extends Procedure> procedureClass, int id, boolean supplemental, long preExecutionWait, long postExecutionWait) {
+    protected TransactionType(Class<? extends Procedure> procedureClass, int id, boolean supplemental, long preExecutionWait, long postExecutionWait, String hintset) {
         this.procedureClass = procedureClass;
         this.id = id;
         this.supplemental = supplemental;
         this.preExecutionWait = preExecutionWait;
         this.postExecutionWait = postExecutionWait;
+        this.hintset = hintset;
     }
 
     public Class<? extends Procedure> getProcedureClass() {
@@ -66,6 +68,10 @@ public class TransactionType implements Comparable<TransactionType> {
         return postExecutionWait;
     }
 
+    public String getHintset() {
+        return hintset;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -75,12 +81,12 @@ public class TransactionType implements Comparable<TransactionType> {
             return false;
         }
         TransactionType that = (TransactionType) o;
-        return id == that.id && supplemental == that.supplemental && preExecutionWait == that.preExecutionWait && postExecutionWait == that.postExecutionWait && procedureClass.equals(that.procedureClass);
+        return id == that.id && supplemental == that.supplemental && preExecutionWait == that.preExecutionWait && postExecutionWait == that.postExecutionWait && hintset == that.hintset && procedureClass.equals(that.procedureClass);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(procedureClass, id, supplemental, preExecutionWait, postExecutionWait);
+        return Objects.hash(procedureClass, id, supplemental, preExecutionWait, postExecutionWait, hintset);
     }
 
     @Override

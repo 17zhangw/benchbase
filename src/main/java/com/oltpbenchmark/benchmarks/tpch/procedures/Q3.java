@@ -17,6 +17,7 @@
 
 package com.oltpbenchmark.benchmarks.tpch.procedures;
 
+import com.oltpbenchmark.api.TransactionType;
 import com.oltpbenchmark.api.SQLStmt;
 import com.oltpbenchmark.benchmarks.tpch.TPCHConstants;
 import com.oltpbenchmark.benchmarks.tpch.TPCHUtil;
@@ -29,7 +30,11 @@ import java.sql.SQLException;
 
 public class Q3 extends GenericQuery {
 
-    public final SQLStmt query_stmt = new SQLStmt("""
+    public SQLStmt query_stmt;
+
+    @Override
+    protected void initializeStmts(TransactionType ttype) {
+        String query = """
             SELECT
                l_orderkey,
                SUM(l_extendedprice * (1 - l_discount)) AS revenue,
@@ -52,8 +57,10 @@ public class Q3 extends GenericQuery {
             ORDER BY
                revenue DESC,
                o_orderdate LIMIT 10
-            """
-    );
+            """;
+
+        this.query_stmt = new SQLStmt(query, ttype.getHintset());
+    }
 
     @Override
     protected PreparedStatement getStatement(Connection conn, RandomGenerator rand, double scaleFactor) throws SQLException {

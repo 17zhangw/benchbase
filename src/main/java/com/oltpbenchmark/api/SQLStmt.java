@@ -86,7 +86,7 @@ public final class SQLStmt {
     }
 
     public final String getSQL() {
-        if (!this.hintset.trim().isEmpty())
+		if (this.hintset != null && !this.hintset.trim().isEmpty())
         {
             return "/*+ " + this.hintset + " */ " + this.sql;
         }

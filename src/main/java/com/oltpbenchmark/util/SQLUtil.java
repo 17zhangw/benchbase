@@ -448,6 +448,15 @@ public abstract class SQLUtil {
      * Extract catalog information from the database directly.
      */
     private static AbstractCatalog getCatalogDirect(DatabaseType databaseType, Connection connection) throws SQLException {
+		String timeout = null;
+		if (databaseType.equals(DatabaseType.POSTGRES)) {
+			ResultSet out = connection.createStatement().executeQuery("SHOW statement_timeout");
+			while (out.next()) {
+				timeout = out.getString("statement_timeout");
+			}
+			connection.createStatement().executeUpdate("SET statement_timeout = 0");
+		}
+
         DatabaseMetaData md = connection.getMetaData();
 
         String separator = md.getIdentifierQuoteString();
@@ -462,7 +471,6 @@ public abstract class SQLUtil {
             // cockroachdb has a hidden column called "ROWID" that should not be directly used via the catalog
             excludedColumns.add("ROWID");
         }
-
 
         try (ResultSet table_rs = md.getTables(catalog, schema, null, new String[]{"TABLE"})) {
             while (table_rs.next()) {
@@ -542,6 +550,10 @@ public abstract class SQLUtil {
                 }
             }
         }
+
+		if (timeout != null) {
+			connection.createStatement().executeUpdate("SET statement_timeout = '" + timeout + "'");
+		}
 
         return new Catalog(tables);
     }
